@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Practice Site</title>
+</head>
+<body>
+  <h1>Welcome to My Practice Website</h1>
+  <p>This is just for testing the AI chat bubble.</p>
+
+<!-- AI Assistant Bubble -->
+<div id="ai-bubble" 
+style="position:fixed;right:20px;bottom:20px;width:56px;height:56px;border-radius:50%;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 
+6px 20px rgba(0,0,0,.2);font-weight:bold;z-index:999999;">💬</div>
+
+<div id="ai-box" 
+style="position:fixed;right:20px;bottom:90px;width:320px;max-height:460px;background:#fff;border:1px 
+solid 
+#ddd;border-radius:12px;display:none;flex-direction:column;overflow:hidden;z-index:999999;box-shadow:0 
+6px 30px rgba(0,0,0,.15);font-family:sans-serif;">
+  <div 
+style="padding:10px;background:#111;color:#fff;display:flex;justify-content:space-between;">
+    <div>Assistant</div>
+    <div id="ai-close" style="cursor:pointer;">✕</div>
+  </div>
+  <div id="ai-log" 
+style="padding:10px;overflow-y:auto;height:300px;border-bottom:1px 
+solid #eee;font-size:14px;"></div>
+  <div style="display:flex;gap:6px;padding:8px;">
+    <input id="ai-input" placeholder="Type here..." 
+style="flex:1;padding:8px;border:1px solid #ccc;border-radius:8px;" 
+/>
+    <button id="ai-send" style="padding:8px 
+12px;border:none;background:#111;color:#fff;border-radius:8px;cursor:pointer;">Send</button>
+  </div>
+</div>
+
+<script>
+  // CHANGE THIS for each client
+  const BIZ_ID = "coffee_shop"; // <-- Example: use "dentist" for 
+dentist site
+  const ASSISTANT_API = "http://127.0.0.1:8000"; // will change 
+later when online
+
+  const bubble = document.getElementById("ai-bubble");
+  const box = document.getElementById("ai-box");
+  const closeBtn = document.getElementById("ai-close");
+  const log = document.getElementById("ai-log");
+  const input = document.getElementById("ai-input");
+  const send = document.getElementById("ai-send");
+
+  bubble.onclick = () => { box.style.display = "flex"; 
+input.focus(); };
+  closeBtn.onclick = () => { box.style.display = "none"; };
+
+  function add(role, text) {
+    const div = document.createElement("div");
+    div.style.margin = "6px 0";
+    div.style.textAlign = role === "user" ? "right" : "left";
+    div.innerHTML = `<span 
+style="background:${role==="user"?"#e8f0ff":"#f5f5f5"};padding:6px 
+10px;border-radius:8px;display:inline-block;">${text}</span>`;
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  async function ask(msg) {
+    add("user", msg);
+    input.value = "";
+    add("bot", "…thinking…");
+    try {
+      const r = await 
+fetch(`${ASSISTANT_API}/chat/${encodeURIComponent(BIZ_ID)}`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ message: msg })
+      });
+      const data = await r.json();
+      log.lastChild.innerText = data.reply || "No reply.";
+    } catch {
+      log.lastChild.innerText = "Error contacting server.";
+    }
+  }
+
+  send.onclick = () => { if (input.value.trim()) 
+ask(input.value.trim()); };
+  input.addEventListener("keydown", e => { if (e.key==="Enter" && 
+input.value.trim()) ask(input.value.trim()); });
+</script>
+</body> 
+</html>
+

@@ -1,0 +1,16 @@
+{
+  "business_name": "Downtown Coffee",
+  "system_message": "You are a friendly coffee shop assistant. Greet 
+customers warmly and answer questions about our drinks, hours, and 
+location.",
+  "faq": {
+    "What are your hours?": "We’re open Mon–Fri 7am–6pm, Sat–Sun 
+8am–4pm.",
+    "Where are you located?": "We’re at 123 Main Street, right downtown.",
+    "Do you have Wi-Fi?": "Yes! We offer free high-speed Wi-Fi to all 
+customers.",
+    "What’s your best drink?": "Our caramel latte is very popular, but the 
+cold brew is also a favorite."
+  }
+}
+

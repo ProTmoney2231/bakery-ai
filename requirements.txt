@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+openai
+chromadb
+python-dotenv
+pydantic
+
+# Dev
+flake8
+pytest

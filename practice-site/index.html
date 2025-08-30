@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Practice Site</title>
+</head>
+<body>
+  <h2>Welcome to My Practice Site</h2>
+  <p>This is just a fake site to test the assistant.</p>
+
+  <!-- The widget will inject itself; nothing else needed here -->
+  <script src="./widget.js"></script>
+  <script>
+    // Configure which assistant to use and where your API is
+    window.BIZ_ASSISTANT_CONFIG = {
+      endpoint: "http://127.0.0.1:8000",
+      assistantId: "coffee_shop" // change to "dentist" to test the other one
+    };
+  </script>
+</body>
+</html>

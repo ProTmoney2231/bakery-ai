@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Biz Assistant</title>
+</head>
+<body>
+  <h1>Biz Assistant</h1>
+
+  <!-- Where messages will show -->
+  <div id="chat" style="border:1px solid black; height:200px; 
+overflow-y:auto; margin-bottom:10px;"></div>
+
+  <!-- Input box + button -->
+  <input id="message" type="text" placeholder="Type your message here">
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    async function sendMessage() {
+      let input = document.getElementById("message");
+      let chat = document.getElementById("chat");
+
+      // Show what user typed
+      chat.innerHTML += "<div><b>You:</b> " + input.value + "</div>";
+
+      // Send it to your FastAPI server
+      let response = await fetch("http://127.0.0.1:8000/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ message: input.value })
+      });
+
+      let data = await response.json();
+
+      // Show bot reply
+      chat.innerHTML += "<div><b>Bot:</b> " + data.reply + "</div>";
+
+      input.value = "";
+      chat.scrollTop = chat.scrollHeight; // auto scroll
+    }
+  </script>
+</body>
+</html>
+
