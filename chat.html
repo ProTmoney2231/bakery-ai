@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Biz Assistant (Chat Bubble)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .chat-container {
+      width: 400px;
+      height: 600px;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .chat-header {
+      background: #2563eb;
+      color: white;
+      padding: 12px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .chat-messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .bubble {
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      margin: 6px 0;
+      line-height: 1.4;
+    }
+    .user {
+      align-self: flex-end;
+      background: #2563eb;
+      color: white;
+      border-bottom-right-radius: 0;
+    }
+    .bot {
+      align-self: flex-start;
+      background: #e5e7eb;
+      color: #111827;
+      border-bottom-left-radius: 0;
+    }
+    .chat-input {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+    .chat-input button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      margin-left: 8px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .chat-input button:hover {
+      background: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">Biz Assistant 💬</div>
+    <div class="chat-messages" id="chat"></div>
+    <div class="chat-input">
+      <input id="msg" placeholder="Type your message..." />
+      <button id="send">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const msg = document.getElementById("msg");
+    const send = document.getElementById("send");
+
+    function addBubble(text, who) {
+      const div = document.createElement("div");
+      div.className = "bubble " + who;
+      div.innerText = text;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const text = msg.value.trim();
+      if (!text) return;
+      addBubble(text, "user");
+      msg.value = "";
+
+      try {
+        const res = await fetch("/assistant", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          addBubble("Error: " + (data.detail || "Unknown error"), "bot");
+        } else {
+          addBubble(data.response, "bot");
+        }
+      } catch (err) {
+        addBubble("Network error: " + err, "bot");
+      }
+    }
+
+    send.addEventListener("click", sendMessage);
+    msg.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>

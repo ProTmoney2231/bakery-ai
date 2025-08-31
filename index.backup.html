@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Biz Assistant</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #chat { border: 1px solid #ddd; padding: 10px; height: 320px; overflow-y: auto; margin-bottom: 12px; }
+    .row { margin: 6px 0; }
+    .you b { color: #2563eb; }
+    .bot b { color: #16a34a; }
+    input, button { font-size: 16px; padding: 8px; }
+    input { width: 70%; }
+  </style>
+</head>
+<body>
+  <h1>Business Assistant</h1>
+  <div id="chat"></div>
+  <input id="msg" placeholder="Type your message…" />
+  <button id="send">Send</button>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const msg = document.getElementById("msg");
+    const send = document.getElementById("send");
+
+    async function sendMessage() {
+      const text = msg.value.trim();
+      if (!text) return;
+      chat.innerHTML += `<div class="row you"><b>You:</b> ${text}</div>`;
+      msg.value = "";
+      chat.scrollTop = chat.scrollHeight;
+
+      try {
+        const res = await fetch("/assistant", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          chat.innerHTML += `<div class="row bot"><b>Assistant (error):</b> ${data.detail || "Unknown error"}</div>`;
+        } else {
+          chat.innerHTML += `<div class="row bot"><b>Assistant:</b> ${data.response}</div>`;
+        }
+      } catch (err) {
+        chat.innerHTML += `<div class="row bot"><b>Assistant (network error):</b> ${err}</div>`;
+      }
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    send.addEventListener("click", sendMessage);
+    msg.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+  </script>
+</body>
+</html>

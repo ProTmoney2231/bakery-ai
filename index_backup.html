@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sweet Treats Bakery</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fef3c7; /* secondary_color */
+      margin: 0; padding: 0;
+      text-align: center;
+    }
+    header {
+      background-color: #d97706; /* primary_color */
+      color: white;
+      padding: 20px;
+      font-size: 1.5em;
+    }
+    .chatbox {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 300px;
+      background: white;
+      border: 2px solid #d97706;
+      border-radius: 12px;
+      box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+    }
+    .messages {
+      padding: 10px;
+      height: 200px;
+      overflow-y: auto;
+      text-align: left;
+    }
+    .input-area {
+      display: flex;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-top: 1px solid #ccc;
+      outline: none;
+    }
+    .input-area button {
+      background-color: #d97706;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>🥐 Sweet Treats Bakery</header>
+  <h2>Welcome to Sweet Treats Bakery! How can we make your day sweeter?</h2>
+
+  <div class="chatbox">
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Type a message...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const messagesDiv = document.getElementById("messages");
+
+      // Add user message
+      const userText = document.createElement("div");
+      userText.textContent = "🧑: " + input.value;
+      messagesDiv.appendChild(userText);
+
+      // Send to server
+      const response = await fetch("http://127.0.0.1:8000/assistant", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ message: input.value })
+      });
+      const data = await response.json();
+
+      // Add assistant reply
+      const botText = document.createElement("div");
+      botText.textContent = "🤖: " + (data.reply || "Error: " + data.error);
+      messagesDiv.appendChild(botText);
+
+      input.value = "";
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+  </script>
+</body>
+</html>
