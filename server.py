@@ -1,36 +1,26 @@
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from dotenv import load_dotenv
-from openai import OpenAI
 import os
+from flask import Flask, request, jsonify
+from openai import OpenAI
 
-# Load .env file
-load_dotenv()
-
-# Initialize client with key from .env
+app = Flask(__name__)
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-app = FastAPI()
+@app.route("/assistant", methods=["POST"])
+@app.route("/chat", methods=["POST"])  # 👈 /chat is now an alias
+def chat():
+    data = request.get_json()
+    user_message = data.get("message", "")
 
-# Allow frontend requests
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a helpful AI assistant for a bakery website."},
+            {"role": "user", "content": user_message}
+        ]
+    )
 
-class Message(BaseModel):
-    message: str
+    reply = completion.choices[0].message.content
+    return jsonify({"reply": reply})
 
-@app.post("/assistant")
-async def assistant(msg: Message):
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": msg.message}]
-        )
-        return {"reply": response.choices[0].message.content}
-    except Exception as e:
-        return {"detail": str(e)}
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
