@@ -1,4 +1,6 @@
 fastapi
-uvicorn
+uvicorn[standard]
+openai>=1.40.0
 python-dotenv
-openai
+jinja2
+starlette
