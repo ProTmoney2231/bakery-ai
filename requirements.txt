@@ -4,3 +4,4 @@ openai>=1.40.0
 python-dotenv
 jinja2
 starlette
+flask
