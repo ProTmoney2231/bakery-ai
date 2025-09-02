@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+gunicorn
+pydantic>=2
+python-dotenv
+# openai is optional; not used by the root/health endpoints
+openai>=1.40.0
