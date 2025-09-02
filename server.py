@@ -1,8 +1,13 @@
 from flask import Flask, request, jsonify
+import os
+from openai import OpenAI
 
 app = Flask(__name__)
 
-# Homepage (with chat box)
+# Setup OpenAI client
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+
+# Homepage with chat box
 @app.route("/")
 def home():
     return """
@@ -35,11 +40,9 @@ def home():
                 const userMsg = input.value;
                 if (!userMsg) return;
 
-                // Add user message
                 chatBox.innerHTML += '<div class="msg user">' + userMsg + '</div>';
                 input.value = "";
 
-                // Send to backend
                 const res = await fetch("/chat", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -47,7 +50,6 @@ def home():
                 });
                 const data = await res.json();
 
-                // Add AI reply
                 chatBox.innerHTML += '<div class="msg">' + data.reply + '</div>';
                 chatBox.scrollTop = chatBox.scrollHeight;
             }
@@ -56,18 +58,23 @@ def home():
     </html>
     """
 
-# Chat API endpoint
+# Chat endpoint with OpenAI
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
     user_message = data.get("message", "")
 
-    if "bread" in user_message.lower():
-        reply = "Our sourdough bread is freshly baked and very popular!"
-    elif "cake" in user_message.lower():
-        reply = "We have chocolate, vanilla, and strawberry cakes available."
-    else:
-        reply = "Hello! I recommend trying our croissants – buttery and perfect any time of day."
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",  # Fast & cheap model
+            messages=[
+                {"role": "system", "content": "You are a helpful bakery assistant. Answer about breads, cakes, and pastries in a friendly way."},
+                {"role": "user", "content": user_message}
+            ]
+        )
+        reply = response.choices[0].message.content
+    except Exception as e:
+        reply = f"Error: {str(e)}"
 
     return jsonify({"reply": reply})
 
