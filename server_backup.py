@@ -1,29 +1,21 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-import os
+from fastapi import FastAPI, Request
+import uvicorn
 
-app = FastAPI(title="bakery-ai")
+app = FastAPI()
 
-@app.get("/")
-async def root():
-    return {"ok": True, "service": "bakery-ai", "status": "healthy"}
+@app.get('/')
+def read_root():
+    return {'status': 'ok', 'message': 'Simple FastAPI app is running!'}
 
-class ChatIn(BaseModel):
-    message: str
+@app.post('/assistant')
+async def assistant(request: Request):
+    data = await request.json()
+    return {'echo': data.get('message', 'No message received')}
 
-@app.post("/assistant")
-async def assistant(body: ChatIn):
-    return {
-        "reply": f"Hello! You said: '{body.message}'. Try our almond croissant today. 🥐"
-    }
+@app.post('/chat')
+async def chat(request: Request):
+    data = await request.json()
+    return {'chat_reply': f"You said: {data.get('message', '')}"}
 
-@app.post("/chat")
-async def chat(body: ChatIn):
-    return {
-        "reply": "Top picks: raspberry tart, almond croissant, and sourdough loaf."
-    }
-
-# Optional local run
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", "8000")))
+if __name__ == '__main__':
+    uvicorn.run('server:app', host='0.0.0.0', port=10000, reload=True)
