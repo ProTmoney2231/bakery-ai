@@ -1,4 +1,1 @@
-flask
-openai
-gunicorn
-uvicorn
+flask\nopenai\nuvicorn\ngunicorn
