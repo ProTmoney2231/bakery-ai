@@ -1,26 +1,56 @@
-import os
-from flask import Flask, request, jsonify
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from dotenv import load_dotenv
 from openai import OpenAI
+import os
 
-app = Flask(__name__)
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Load .env if present (local dev)
+load_dotenv()
 
-@app.route("/assistant", methods=["POST"])
-@app.route("/chat", methods=["POST"])  # 👈 /chat is now an alias
-def chat():
-    data = request.get_json()
-    user_message = data.get("message", "")
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    # On Render this must be set in Settings → Environment
+    raise RuntimeError("Missing OPENAI_API_KEY environment variable")
 
-    completion = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a helpful AI assistant for a bakery website."},
-            {"role": "user", "content": user_message}
-        ]
-    )
+client = OpenAI(api_key=api_key)
+app = FastAPI(title="Bakery AI")
 
-    reply = completion.choices[0].message.content
-    return jsonify({"reply": reply})
+# CORS (frontends can call us from any origin; tighten in prod)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+class ChatRequest(BaseModel):
+    message: str
+
+def chat_reply(user_text: str) -> str:
+    try:
+        resp = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a friendly bakery assistant. Be concise and helpful."},
+                {"role": "user", "content": user_text},
+            ],
+            temperature=0.7,
+        )
+        return resp.choices[0].message.content
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/assistant")
+def assistant(req: ChatRequest):
+    return {"reply": chat_reply(req.message)}
+
+# Alias so /chat works too
+@app.post("/chat")
+def chat(req: ChatRequest):
+    return {"reply": chat_reply(req.message)}
+
+# Simple health check
+@app.get("/")
+def root():
+    return {"ok": True, "service": "bakery-ai"}
