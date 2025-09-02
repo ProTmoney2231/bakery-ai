@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Homepage (HTML)
+# Homepage (with chat box)
 @app.route("/")
 def home():
     return """
@@ -13,18 +13,45 @@ def home():
         <style>
             body { font-family: Arial, sans-serif; background: #faf3e0; text-align: center; padding: 50px; }
             h1 { color: #d2691e; }
-            p { font-size: 18px; }
             .box { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: inline-block; }
-            .chat-link { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #d2691e; color: white; text-decoration: none; border-radius: 5px; }
-            .chat-link:hover { background: #a0522d; }
+            #chat-box { margin-top: 20px; text-align: left; max-width: 400px; margin-left: auto; margin-right: auto; }
+            .msg { background: #eee; padding: 10px; margin: 5px 0; border-radius: 8px; }
+            .user { background: #d2691e; color: white; text-align: right; }
         </style>
     </head>
     <body>
         <div class="box">
-            <h1>Welcome to Bakery AI</h1>
-            <p>Your friendly assistant for bakery recommendations 🍞🥐🍰</p>
-            <a href="/chat" class="chat-link">Try the Chat API</a>
+            <h1>Welcome to Bakery AI 🥐</h1>
+            <p>Ask me about breads, cakes, or pastries!</p>
+            <input id="user-input" type="text" placeholder="Type your message..." style="padding:10px;width:80%;border-radius:5px;border:1px solid #ccc;">
+            <button onclick="sendMessage()" style="padding:10px 15px;margin-left:5px;background:#d2691e;color:white;border:none;border-radius:5px;">Send</button>
+            <div id="chat-box"></div>
         </div>
+
+        <script>
+            async function sendMessage() {
+                const input = document.getElementById("user-input");
+                const chatBox = document.getElementById("chat-box");
+                const userMsg = input.value;
+                if (!userMsg) return;
+
+                // Add user message
+                chatBox.innerHTML += '<div class="msg user">' + userMsg + '</div>';
+                input.value = "";
+
+                // Send to backend
+                const res = await fetch("/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: userMsg })
+                });
+                const data = await res.json();
+
+                // Add AI reply
+                chatBox.innerHTML += '<div class="msg">' + data.reply + '</div>';
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        </script>
     </body>
     </html>
     """
@@ -35,13 +62,12 @@ def chat():
     data = request.get_json()
     user_message = data.get("message", "")
 
-    # Simple rule-based reply
     if "bread" in user_message.lower():
         reply = "Our sourdough bread is freshly baked and very popular!"
     elif "cake" in user_message.lower():
         reply = "We have chocolate, vanilla, and strawberry cakes available."
     else:
-        reply = "Hello! I recommend trying our croissants – they’re buttery and perfect for any time of day."
+        reply = "Hello! I recommend trying our croissants – buttery and perfect any time of day."
 
     return jsonify({"reply": reply})
 
