@@ -54,3 +54,26 @@ def chat(req: ChatRequest):
 @app.get("/")
 def root():
     return {"ok": True, "service": "bakery-ai"}
+
+# --- Added homepage route ---
+from fastapi.responses import HTMLResponse
+
+@app.get("/", response_class=HTMLResponse)
+def home():
+    return """
+    <html>
+        <head>
+            <title>Sweet Treats Bakery AI</title>
+        </head>
+        <body style="font-family: sans-serif; text-align: center; margin-top: 50px;">
+            <h1>🥐 Welcome to Sweet Treats Bakery AI</h1>
+            <p>Your AI assistant is ready to help!</p>
+            <p>Try our endpoints:</p>
+            <ul style="list-style:none;">
+                <li><a href="/docs" target="_blank">📘 API Docs (/docs)</a></li>
+                <li><a href="/assistant" target="_blank">🤖 Assistant (/assistant)</a></li>
+                <li><a href="/chat" target="_blank">💬 Chat (/chat)</a></li>
+            </ul>
+        </body>
+    </html>
+    """
