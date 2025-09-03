@@ -1,59 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Sweet Treats Bakery</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sweet Treats Bakery</title>
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-    <header>
-        <h1>🍰 Sweet Treats Bakery</h1>
-        <p>Freshly baked happiness, every day!</p>
-    </header>
+  <header class="hero">
+    <div class="hero-overlay">
+      <h1>🍰 Sweet Treats Bakery</h1>
+      <p>Freshly baked happiness, every day.</p>
+      <a class="btn" href="#menu">Explore Menu</a>
+    </div>
+  </header>
 
-    <section class="menu">
-        <h2>Our Menu</h2>
-        <div class="items">
-            <div class="item">🥐 Croissants</div>
-            <div class="item">🧁 Cupcakes</div>
-            <div class="item">🍞 Breads</div>
-            <div class="item">🍪 Cookies</div>
-            <div class="item">🎂 Cakes</div>
-        </div>
+  <nav class="topbar">
+    <div class="brand">Sweet Treats</div>
+    <div class="nav-right">
+      <a href="#menu">Menu</a>
+      <a href="#about">About</a>
+      <a href="#visit">Visit</a>
+    </div>
+  </nav>
+
+  <main>
+    <section id="menu" class="section">
+      <h2>Today’s Menu</h2>
+      <div class="grid">
+        <article class="card">
+          <div class="emoji">🥐</div>
+          <h3>Almond Croissant</h3>
+          <p>Buttery layers, toasted almonds, touch of sweetness.</p>
+          <span class="price">$4.50</span>
+        </article>
+        <article class="card">
+          <div class="emoji">🧁</div>
+          <h3>Lemon Cupcake</h3>
+          <p>Zesty sponge with silky lemon buttercream.</p>
+          <span class="price">$3.75</span>
+        </article>
+        <article class="card">
+          <div class="emoji">🍞</div>
+          <h3>Sourdough Loaf</h3>
+          <p>72-hour ferment for deep flavor and crackly crust.</p>
+          <span class="price">$6.50</span>
+        </article>
+        <article class="card">
+          <div class="emoji">🍪</div>
+          <h3>Chocolate Chunk Cookie</h3>
+          <p>Gooey center, crisp edges, sea-salt finish.</p>
+          <span class="price">$2.75</span>
+        </article>
+        <article class="card">
+          <div class="emoji">🎂</div>
+          <h3>Celebration Cake</h3>
+          <p>Custom flavors and designs—order 48h ahead.</p>
+          <span class="price">From $38</span>
+        </article>
+      </div>
     </section>
 
-    <footer>
-        <p>Visit us at Main Street • Open 7am - 7pm</p>
-    </footer>
+    <section id="about" class="section muted">
+      <h2>About Us</h2>
+      <p>Family-owned since 1998. We mill select grains, proof slowly, and bake in small batches for peak flavor.</p>
+    </section>
 
-    <!-- Chat Bubble -->
-    <div id="chat-container">
-        <div id="chat-header">💬 Chat with us</div>
-        <div id="chat-box"></div>
-        <input type="text" id="user-input" placeholder="Type a message...">
-    </div>
+    <section id="visit" class="section">
+      <h2>Visit</h2>
+      <p>Main Street • Open daily 7am–7pm</p>
+    </section>
+  </main>
 
-    <script>
-        const chatBox = document.getElementById("chat-box");
-        const userInput = document.getElementById("user-input");
+  <footer>
+    © <span id="year"></span> Sweet Treats Bakery · Made with love
+  </footer>
 
-        userInput.addEventListener("keypress", async (e) => {
-            if (e.key === "Enter" && userInput.value.trim() !== "") {
-                const message = userInput.value;
-                chatBox.innerHTML += "<div class='user'>You: " + message + "</div>";
-                userInput.value = "";
+  <!-- Chat Bubble -->
+  <div id="chat">
+    <div id="chat-head">💬 Chat with us</div>
+    <div id="chat-log"></div>
+    <input id="chat-input" placeholder="Ask about today’s pastries…" />
+  </div>
 
-                const response = await fetch("/chat", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ message })
-                });
-
-                const data = await response.json();
-                chatBox.innerHTML += "<div class='bot'>Bakery Bot: " + data.reply + "</div>";
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }
-        });
-    </script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+    const log = document.getElementById("chat-log");
+    const input = document.getElementById("chat-input");
+    function add(role, text){
+      const div = document.createElement("div");
+      div.className = role;
+      div.textContent = text;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+    input.addEventListener("keypress", async (e)=>{
+      if (e.key === "Enter" && input.value.trim()){
+        const message = input.value.trim();
+        add("user", "You: " + message);
+        input.value = "";
+        try{
+          const res = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+          });
+          const data = await res.json();
+          add("bot", "Bakery Bot: " + (data.reply || "Sorry, I didn’t catch that."));
+        }catch(err){
+          add("bot", "Bakery Bot: Oops—network hiccup. Try again!");
+        }
+      }
+    });
+  </script>
 </body>
 </html>
