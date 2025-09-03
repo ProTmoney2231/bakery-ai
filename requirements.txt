@@ -1,4 +1,7 @@
 Flask>=3
+Flask>=3.0
 gunicorn>=21
-uvicorn[standard]>=0.30.0
+gunicorn>=21.2
+openai>=1.40
 openai>=1.40.0
+python-dotenv>=1.0
