@@ -4,112 +4,137 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sweet Treats Bakery</title>
-  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600..900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body>
-  <header class="hero">
-    <div class="hero-overlay">
-      <h1>🍰 Sweet Treats Bakery</h1>
-      <p>Freshly baked happiness, every day.</p>
-      <a class="btn" href="#menu">Explore Menu</a>
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="brand">Sweet <span>Treats</span></div>
+      <nav class="menu">
+        <a href="#menu">Menu</a>
+        <a href="#about">About</a>
+        <a href="#visit">Visit</a>
+      </nav>
     </div>
   </header>
 
-  <nav class="topbar">
-    <div class="brand">Sweet Treats</div>
-    <div class="nav-right">
-      <a href="#menu">Menu</a>
-      <a href="#about">About</a>
-      <a href="#visit">Visit</a>
+  <section class="hero container">
+    <div class="hero-text">
+      <h1>Baked fresh, all day.</h1>
+      <p>From buttery croissants to celebration cakes — handcrafted with love and the finest ingredients.</p>
+      <a class="cta" href="#menu">Explore Menu</a>
     </div>
-  </nav>
+    <div class="hero-card">
+      <div class="badge">New</div>
+      <h3>Seasonal: Apple Cider Donuts</h3>
+      <p>Warm spices, crunchy sugar, and farm-fresh cider glaze.</p>
+    </div>
+  </section>
 
-  <main>
-    <section id="menu" class="section">
-      <h2>Today’s Menu</h2>
-      <div class="grid">
-        <article class="card">
-          <div class="emoji">🥐</div>
-          <h3>Almond Croissant</h3>
-          <p>Buttery layers, toasted almonds, touch of sweetness.</p>
-          <span class="price">$4.50</span>
-        </article>
-        <article class="card">
-          <div class="emoji">🧁</div>
-          <h3>Lemon Cupcake</h3>
-          <p>Zesty sponge with silky lemon buttercream.</p>
-          <span class="price">$3.75</span>
-        </article>
-        <article class="card">
-          <div class="emoji">🍞</div>
-          <h3>Sourdough Loaf</h3>
-          <p>72-hour ferment for deep flavor and crackly crust.</p>
-          <span class="price">$6.50</span>
-        </article>
-        <article class="card">
-          <div class="emoji">🍪</div>
-          <h3>Chocolate Chunk Cookie</h3>
-          <p>Gooey center, crisp edges, sea-salt finish.</p>
-          <span class="price">$2.75</span>
-        </article>
-        <article class="card">
-          <div class="emoji">🎂</div>
-          <h3>Celebration Cake</h3>
-          <p>Custom flavors and designs—order 48h ahead.</p>
-          <span class="price">From $38</span>
-        </article>
+  <section id="menu" class="container grid">
+    <div class="card">
+      <h3>Almond Croissant</h3>
+      <p>Flaky layers, toasted almonds, and a hint of orange blossom.</p>
+      <div class="price">$4.50</div>
+    </div>
+    <div class="card">
+      <h3>Triple-Chocolate Brownie</h3>
+      <p>Fudgy center with dark, milk, and white chocolate chunks.</p>
+      <div class="price">$3.75</div>
+    </div>
+    <div class="card">
+      <h3>Vanilla Bean Cake</h3>
+      <p>Perfect for birthdays with strawberry compote filling.</p>
+      <div class="price">$28 / 6”</div>
+    </div>
+    <div class="card">
+      <h3>Raspberry Tart</h3>
+      <p>Buttery crust, silky custard, and fresh raspberries.</p>
+      <div class="price">$5.50</div>
+    </div>
+  </section>
+
+  <section id="about" class="container about">
+    <h2>About Us</h2>
+    <p>Family-owned since 1998. We mill our own flour, temper our chocolate, and proof our doughs slowly for flavor that sings.</p>
+  </section>
+
+  <section id="visit" class="visit">
+    <div class="container visit-inner">
+      <div>
+        <h2>Visit Our Shop</h2>
+        <p>123 Baker Street • Open daily 7am–6pm</p>
       </div>
-    </section>
+      <a class="cta secondary" href="https://maps.apple.com/?q=123%20Baker%20Street" target="_blank" rel="noreferrer">Get Directions</a>
+    </div>
+  </section>
 
-    <section id="about" class="section muted">
-      <h2>About Us</h2>
-      <p>Family-owned since 1998. We mill select grains, proof slowly, and bake in small batches for peak flavor.</p>
-    </section>
-
-    <section id="visit" class="section">
-      <h2>Visit</h2>
-      <p>Main Street • Open daily 7am–7pm</p>
-    </section>
-  </main>
-
-  <footer>
-    © <span id="year"></span> Sweet Treats Bakery · Made with love
-  </footer>
-
-  <!-- Chat Bubble -->
-  <div id="chat">
-    <div id="chat-head">💬 Chat with us</div>
-    <div id="chat-log"></div>
-    <input id="chat-input" placeholder="Ask about today’s pastries…" />
+  <!-- Floating Chat Bubble -->
+  <button id="chat-toggle" class="chat-toggle" aria-label="Open chat">💬</button>
+  <div id="chat-panel" class="chat-panel" hidden>
+    <div class="chat-header">
+      <div>Bakery Assistant</div>
+      <button id="chat-close" class="chat-close" aria-label="Close">✕</button>
+    </div>
+    <div id="chat-body" class="chat-body">
+      <div class="msg bot">Hi! I’m your pastry concierge. What are you in the mood for? 🥐🍰</div>
+    </div>
+    <form id="chat-form" class="chat-input" autocomplete="off">
+      <input id="chat-text" type="text" placeholder="Ask me for a recommendation…" />
+      <button class="send" type="submit">Send</button>
+    </form>
   </div>
 
   <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-    const log = document.getElementById("chat-log");
-    const input = document.getElementById("chat-input");
-    function add(role, text){
+    const $ = (sel) => document.querySelector(sel);
+    const chatToggle = $("#chat-toggle");
+    const chatPanel  = $("#chat-panel");
+    const chatClose  = $("#chat-close");
+    const chatForm   = $("#chat-form");
+    const chatText   = $("#chat-text");
+    const chatBody   = $("#chat-body");
+
+    function addMsg(text, who = "bot") {
       const div = document.createElement("div");
-      div.className = role;
+      div.className = "msg " + who;
       div.textContent = text;
-      log.appendChild(div);
-      log.scrollTop = log.scrollHeight;
+      chatBody.appendChild(div);
+      chatBody.scrollTop = chatBody.scrollHeight;
     }
-    input.addEventListener("keypress", async (e)=>{
-      if (e.key === "Enter" && input.value.trim()){
-        const message = input.value.trim();
-        add("user", "You: " + message);
-        input.value = "";
-        try{
-          const res = await fetch("/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message })
-          });
-          const data = await res.json();
-          add("bot", "Bakery Bot: " + (data.reply || "Sorry, I didn’t catch that."));
-        }catch(err){
-          add("bot", "Bakery Bot: Oops—network hiccup. Try again!");
-        }
+
+    chatToggle.addEventListener("click", () => {
+      chatPanel.hidden = false;
+      chatText.focus();
+    });
+    chatClose.addEventListener("click", () => (chatPanel.hidden = true));
+
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = chatText.value.trim();
+      if (!text) return;
+      addMsg(text, "user");
+      chatText.value = "";
+      const thinking = document.createElement("div");
+      thinking.className = "msg bot thinking";
+      thinking.textContent = "Thinking…";
+      chatBody.appendChild(thinking);
+      chatBody.scrollTop = chatBody.scrollHeight;
+
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({ message: text })
+        });
+        const data = await res.json();
+        thinking.remove();
+        addMsg(data.reply || "Sorry, I couldn’t think of anything just now.", "bot");
+      } catch(err) {
+        thinking.remove();
+        addMsg("Oops! The oven’s a little hot. Try again in a moment 🔥", "bot");
       }
     });
   </script>
